@@ -1,17 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace QuoteClient
 {
@@ -23,6 +14,45 @@ namespace QuoteClient
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void OnGetQuote(object sender, RoutedEventArgs e)
+        {
+            const int bufferSize = 1024;
+            Cursor currentCursor = this.Cursor;
+            this.Cursor = Cursors.Wait;
+
+            string serverName = Properties.Settings.Default.ServerName;
+            int port = Properties.Settings.Default.PortNumber;
+
+            var client = new TcpClient();
+            NetworkStream stream = null;
+            try
+            {
+                client.Connect(serverName, port);
+                byte[] buffer = new byte[bufferSize];
+                int received = stream.Read(buffer, 0, bufferSize);
+                if(received <= 0) {
+                    return;
+                }
+                textQuote.Text = Encoding.Unicode.GetString(buffer).Trim('\0');
+            }
+            catch (SocketException ex)
+            {
+                MessageBox.Show(ex.Message, "Error Quote of the day", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                if(stream != null)
+                {
+                    stream.Close();
+                }
+                if(client.Connected)
+                {
+                    client.Close();
+                }
+                this.Cursor = currentCursor;
+            }
         }
     }
 }

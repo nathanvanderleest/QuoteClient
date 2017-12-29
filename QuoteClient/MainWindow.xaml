@@ -7,6 +7,9 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525">
     <Grid>
-        
+        <Button x:Name="quoteButton" Content="Button"  Margin="10,10,10,250" Click="OnGetQuote" />
+        <TextBox x:Name="textQuote" HorizontalAlignment="Center" Height="23" Margin="10,10" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Center" Width="120"/>
+
+
     </Grid>
 </Window>
